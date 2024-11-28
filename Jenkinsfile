@@ -64,8 +64,6 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                         # Pull the image and start the container
                         docker pull vachana999/base-image:${DOCKER_TAG}
-                        docker stop my_ci_cd_container || true
-                        docker rm my_ci_cd_container || true
                         docker run -d --name my_ci_cd_container -p 9000:8080 vachana999/base-image:${DOCKER_TAG}
                         EOF
                     """
