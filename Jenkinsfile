@@ -9,7 +9,7 @@ pipeline {
 
     environment {
         DOCKER_TAG = "" // Placeholder for dynamic tag
-        REMOTE_SSH_KEY = credentials('remote-ssh-key') // SSH key credential ID from Jenkins
+       
         REMOTE_HOST = '172.31.7.122'  // IP of the target Ubuntu machine
         REMOTE_USER = 'ubuntu'  // Username on the target Ubuntu machine
     }
@@ -73,7 +73,7 @@ pipeline {
 
         stage('SSH into Remote Ubuntu Machine') {
             steps {
-                 sshagent(credentials: [REMOTE_SSH_KEY])  {
+                 sshagent([remote-ssh-key])  {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                         # Ensure Docker is installed and configured
