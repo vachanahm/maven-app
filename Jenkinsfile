@@ -19,7 +19,7 @@ pipeline {
         stage('Create a image') {
             steps {
                sh 'docker build -t vachana999/base-image:2 .'
-               sh 'docker run -d -p 9000:8080 vachana999/base-image:2 '
+              
               
             }
         }
