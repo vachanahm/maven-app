@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Git Checkout-github') {
             steps {
-             git branch: 'main', url: 'https://github.com/Aseemakram19/maven-app.git'
+             git branch: 'main', url: 'https://github.com/vachanahm/maven-app.git'
             }
         }
         stage('Build') {
@@ -18,12 +18,13 @@ pipeline {
         }
         stage('Create a image') {
             steps {
-               sh 'docker build -t aseem1 .'
+               sh 'docker build -t vachana999/base-image:tagname .'
+               sh 'docker push vachana999/base-image:tagname'
             }
         }
         stage('Docker Container app') {
             steps {
-               sh 'docker run -d -p 9000:8080 -t aseem1'
+               sh 'docker pull vachana999/base-image:tagname'
             }
         }
     }
