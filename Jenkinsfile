@@ -18,7 +18,8 @@ pipeline {
         }
         stage('Create a image') {
             steps {
-               sh 'docker build -t vachana999/base-image:1.1 .'
+               sh 'docker build -t vachana999/base-image:1 .'
+               sh 'docker run -d -p 9000:8080 vachana999/base-image:1 '
               
             }
         }
@@ -33,7 +34,7 @@ pipeline {
             }
         stage('Docker Container app') {
             steps {
-               sh 'docker push vachana999/base-image:1.1'
+               sh 'docker push vachana999/base-image:1'
             }
         }
     }
