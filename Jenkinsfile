@@ -32,6 +32,7 @@ pipeline {
                     }
                 }
             }
+       }
         stage('Docker Container app') {
             steps {
                sh 'docker push vachana999/base-image:1'
@@ -39,3 +40,4 @@ pipeline {
         }
     }
 }
+
