@@ -18,13 +18,22 @@ pipeline {
         }
         stage('Create a image') {
             steps {
-               sh 'docker build -t vachana999/base-image:tagname .'
-               sh 'docker push vachana999/base-image:tagname'
+               sh 'docker build -t vachana999/base-image:1.1 .'
+              
             }
         }
+       stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'Docker', usernameVariable: 'vachana999', passwordVariable: 'DOCKER_PASS')]) {
+                    script {
+                        // Log in to Docker Hub using the credentials
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    }
+                }
+            }
         stage('Docker Container app') {
             steps {
-               sh 'docker pull vachana999/base-image:tagname'
+               sh 'docker push vachana999/base-image:1.1'
             }
         }
     }
