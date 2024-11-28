@@ -25,8 +25,7 @@ pipeline {
             steps {
                 script {
                     // Generate a dynamic tag using BUILD_NUMBER
-                    def buildNumber = currentBuild.number
-                    DOCKER_TAG = "1.${buildNumber}"
+                    DOCKER_TAG = "1.${env.BUILD_NUMBER}"
                     echo "Docker tag set to: ${DOCKER_TAG}"
                 }
             }
@@ -63,7 +62,7 @@ pipeline {
                 sshagent([REMOTE_SSH_KEY]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-                        # Install Docker if it's not already installed
+                        # Ensure Docker is installed and configured
                         if ! command -v docker &> /dev/null; then
                             echo "Docker not found, installing..."
                             sudo apt-get update -y
@@ -76,24 +75,18 @@ pipeline {
                               \$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
                             sudo apt-get update -y
                             sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
-                            
-                            # Add current user to docker group
                             sudo usermod -aG docker $USER
-                            
-                            # Enable Docker to start on boot
                             sudo systemctl enable docker
-                            
-                            # Start Docker service if not running
                             sudo systemctl start docker
                         else
                             echo "Docker is already installed."
                         fi
 
-                        # Pull the image that was pushed earlier
+                        # Pull the image and start the container
                         docker pull vachana999/base-image:${DOCKER_TAG}
-
-                        # Run the Docker container
-                        docker run -d --name my_ci_cd_container -p 9000:8080  vachana999/base-image:${DOCKER_TAG}
+                        docker stop my_ci_cd_container || true
+                        docker rm my_ci_cd_container || true
+                        docker run -d --name my_ci_cd_container -p 9000:8080 vachana999/base-image:${DOCKER_TAG}
 
                         EOF
                     """
