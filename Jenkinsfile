@@ -21,6 +21,10 @@ pipeline {
             }
         }
 
+
+
+
+
         stage('Determine Docker Tag') {
             steps {
                 script {
@@ -31,17 +35,24 @@ pipeline {
             }
         }
 
+
+        
         stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
 
+
+        
         stage('Create Docker Image') {
             steps {
                 sh "docker build -t vachana999/base-image:${DOCKER_TAG} ."
             }
         }
+
+
+        
 
         stage('Login to Docker Hub') {
             steps {
@@ -51,15 +62,18 @@ pipeline {
             }
         }
 
+        
         stage('Push Docker Image') {
             steps {
                 sh "docker push vachana999/base-image:${DOCKER_TAG}"
             }
         }
 
+        
+
         stage('SSH into Remote Ubuntu Machine') {
             steps {
-                sshagent([REMOTE_SSH_KEY]) {
+                 sshagent(credentials: [REMOTE_SSH_KEY])  {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                         # Ensure Docker is installed and configured
