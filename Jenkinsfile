@@ -9,7 +9,6 @@ pipeline {
 
     environment {
         DOCKER_TAG = "" // Placeholder for dynamic tag
-       
         REMOTE_HOST = '172.31.7.122'  // IP of the target Ubuntu machine
         REMOTE_USER = 'ubuntu'  // Username on the target Ubuntu machine
     }
@@ -21,10 +20,6 @@ pipeline {
             }
         }
 
-
-
-
-
         stage('Determine Docker Tag') {
             steps {
                 script {
@@ -35,24 +30,17 @@ pipeline {
             }
         }
 
-
-        
         stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
 
-
-        
         stage('Create Docker Image') {
             steps {
                 sh "docker build -t vachana999/base-image:${DOCKER_TAG} ."
             }
         }
-
-
-        
 
         stage('Login to Docker Hub') {
             steps {
@@ -62,18 +50,15 @@ pipeline {
             }
         }
 
-        
         stage('Push Docker Image') {
             steps {
                 sh "docker push vachana999/base-image:${DOCKER_TAG}"
             }
         }
 
-        
-
         stage('SSH into Remote Ubuntu Machine') {
             steps {
-                 sshagent([remote-ssh-key])  {
+                sshagent([credentials('remote-ssh-key')]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
                         # Ensure Docker is installed and configured
@@ -89,7 +74,7 @@ pipeline {
                               \$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
                             sudo apt-get update -y
                             sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
-                            sudo usermod -aG docker $USER
+                            sudo usermod -aG docker \$USER
                             sudo systemctl enable docker
                             sudo systemctl start docker
                         else
@@ -101,7 +86,6 @@ pipeline {
                         docker stop my_ci_cd_container || true
                         docker rm my_ci_cd_container || true
                         docker run -d --name my_ci_cd_container -p 9000:8080 vachana999/base-image:${DOCKER_TAG}
-
                         EOF
                     """
                 }
